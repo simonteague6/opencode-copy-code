@@ -1,23 +1,46 @@
 {
   "name": "opencode-copy-code",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Preview and copy fenced assistant code blocks from the OpenCode TUI.",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "tui"
+  ],
+  "homepage": "https://github.com/simonteague6/opencode-copy-code#readme",
+  "bugs": {
+    "url": "https://github.com/simonteague6/opencode-copy-code/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonteague6/opencode-copy-code.git"
+  },
   "type": "module",
-  "exports": { "./tui": "./src/tui.tsx" },
-  "files": ["src"],
+  "exports": {
+    "./tui": "./dist/tui.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "tsx --test tests/*.test.ts",
+    "compile": "node scripts/compile.mjs",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm test"
   },
-  "dependencies": { "@opencode/plugin": "2.2.5" },
+  "dependencies": {
+    "@opencode/plugin": "2.2.5"
+  },
   "peerDependencies": {
     "@opentui/core": ">=0.8.0 <0.9",
     "@opentui/solid": ">=0.8.0 <0.9",
     "solid-js": "^1.9.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
     "@types/node": "^24.0.0",
+    "babel-preset-solid": "^1.9.16",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0"
   }
