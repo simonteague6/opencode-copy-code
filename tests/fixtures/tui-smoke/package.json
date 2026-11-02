@@ -1,0 +1,5 @@
+{
+  "name": "copy-code-smoke-fixture",
+  "type": "module",
+  "exports": { "./tui": "./tui.ts" }
+}

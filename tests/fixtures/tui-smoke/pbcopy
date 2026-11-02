@@ -1,0 +1,7 @@
+#!/bin/sh
+# Test double: never writes to the real system clipboard.
+if [ -e "$COPY_CODE_SMOKE_OUTPUT.fail" ]; then
+  echo "fixture clipboard denied" >&2
+  exit 1
+fi
+cat > "$COPY_CODE_SMOKE_OUTPUT"
