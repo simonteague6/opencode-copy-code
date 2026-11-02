@@ -5,7 +5,7 @@ Preview and copy fenced code blocks from assistant replies in the OpenCode V2 te
 Run `/copy-code` (alias `/cc`), pick a block, and press Enter. The picker lists blocks newest first and previews the first five lines of the selected one. Only the exact block body is copied, without the Markdown fences.
 
 > [!NOTE]
-> This is a TUI plugin for OpenCode V2 (developed against 2.2.5). It is not published to npm yet, so you install it from a local clone.
+> This is a TUI plugin for OpenCode V2 (developed against 2.2.5).
 
 ## Features
 
@@ -20,29 +20,25 @@ Run `/copy-code` (alias `/cc`), pick a block, and press Enter. The picker lists 
 
 ## Install
 
-You need Node.js and npm to install dependencies. OpenCode supplies its own TUI runtime.
-
 ```sh
-git clone https://github.com/simonteague6/opencode-copy-code.git
-cd opencode-copy-code
-npm install
+opencode plugin add github:simonteague6/opencode-copy-code
 ```
 
-Add the absolute path of the clone to the `plugins` array in `~/.config/opencode/cli.json`, keeping your other settings and plugin entries:
+This installs the plugin from GitHub and adds it to your global OpenCode configuration. OpenCode picks it up from its watched configuration; run `/reload` if the command does not appear.
 
-```json
-{
-  "$schema": "https://opencode.ai/v2/cli.json",
-  "plugins": ["/path/to/opencode-copy-code"]
-}
-```
-
-OpenCode watches its CLI configuration. Run `/reload` if the command does not appear.
-
-To try it for a single run without changing your saved configuration, set the config inline. This replaces the configured `plugins` array for that run only:
+To pin a release, add a tag:
 
 ```sh
-OPENCODE_CLI_CONFIG_CONTENT="{\"plugins\":[\"$PWD\"]}" opencode
+opencode plugin add github:simonteague6/opencode-copy-code#v0.2.0
+```
+
+Manage the plugin with:
+
+```sh
+opencode plugin list      # show installed plugins
+opencode plugin check     # check package plugins for updates
+opencode plugin update    # update package plugins
+opencode plugin remove    # remove a plugin from the global configuration
 ```
 
 ## Usage
@@ -77,14 +73,35 @@ On Linux the first backend that succeeds wins. If all fail, the picker shows eac
 
 ## Development
 
+You need Node.js and npm.
+
 ```sh
+git clone https://github.com/simonteague6/opencode-copy-code.git
+cd opencode-copy-code
 npm install
 npm run check
 ```
 
-`npm run check` runs the TypeScript typecheck and the unit tests. The unit tests cover fence parsing, exact body preservation, history pagination, completed-message scanning, filtering, navigation, previews, layout, and clipboard subprocess handling. They never touch your system clipboard.
+`npm run check` runs the TypeScript typecheck and the unit tests. The unit tests cover fence parsing, exact body preservation, history pagination, completed-message scanning, filtering, navigation, previews, layout, clipboard subprocess handling, and that `dist/` matches `src/`. They never touch your system clipboard.
 
-On macOS, an optional live test drives the installed `opencode` in a pseudo-terminal with synthetic history and a fake `pbcopy`:
+The package exports `dist/tui.js`, the compiled output of `src/`. Installs from GitHub do not run a build, so `dist/` is committed. After changing `src/`, run `npm run compile` and commit the updated `dist/`.
+
+To load a local clone, add its absolute path to the `plugins` array in `~/.config/opencode/cli.json`, keeping your other settings and plugin entries:
+
+```json
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "plugins": ["/path/to/opencode-copy-code"]
+}
+```
+
+To try a clone for a single run without changing your saved configuration, set the config inline. This replaces the configured `plugins` array for that run only:
+
+```sh
+OPENCODE_CLI_CONFIG_CONTENT="{\"plugins\":[\"$PWD\"]}" opencode
+```
+
+On macOS, an optional live test drives the installed `opencode` in a pseudo-terminal with synthetic history and a fake `pbcopy`. It loads the plugin source, not `dist/`:
 
 ```sh
 python3 tests/tui-smoke.py
@@ -93,14 +110,16 @@ python3 tests/tui-smoke.py
 It needs Python 3, makes no model requests, uses an inline CLI config, and leaves your saved configuration alone.
 
 ```text
-src/tui.tsx        Slash command and palette registration, notifications
-src/picker.tsx     Picker dialog and code preview
-src/blocks.ts      Fenced-block parsing and history scanning
-src/history.ts     Paginated message retrieval
-src/selection.ts   Filtering, navigation, and display-only sanitizing
-src/layout.ts      Responsive layout and column widths
-src/clipboard.ts   Platform backends and stdin-based subprocess runner
-tests/             Unit tests and the live TUI smoke test
+src/tui.tsx          Slash command and palette registration, notifications
+src/picker.tsx       Picker dialog and code preview
+src/blocks.ts        Fenced-block parsing and history scanning
+src/history.ts       Paginated message retrieval
+src/selection.ts     Filtering, navigation, and display-only sanitizing
+src/layout.ts        Responsive layout and column widths
+src/clipboard.ts     Platform backends and stdin-based subprocess runner
+dist/                Compiled plugin output (generated by npm run compile)
+scripts/compile.mjs  Compiles src/ to dist/
+tests/               Unit tests and the live TUI smoke test
 ```
 
 The plugin follows the [OpenCode V2 TUI plugin API](https://opencode.ai/v2/docs/build/plugins/cli).
